@@ -30,25 +30,51 @@ body > .navbar {
   font-size: 13px;
 }
 
+body > .navbar .navbar-inner {
+  height:40px;
+  background-image: url(../img/nav-bg.png);
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-color: #000;
+  border: 0;
+}
+
 /* Change the docs' brand */
 body > .navbar .brand {
-  padding-right: 0;
+  height: 70px;
+  padding-right: 85px;
   padding-left: 0;
   margin-left: 20px;
   float: right;
   font-weight: bold;
-  color: #000;
+  color: #fff;
+  background-image: url(../img/pac-12-shield.png);
+  background-position-y: 5px;
+  background-position-x: right;
+  background-repeat: no-repeat;
   text-shadow: 0 1px 0 rgba(255,255,255,.1), 0 0 30px rgba(255,255,255,.125);
   -webkit-transition: all .2s linear;
      -moz-transition: all .2s linear;
           transition: all .2s linear;
+
 }
 body > .navbar .brand:hover {
   text-decoration: none;
   text-shadow: 0 1px 0 rgba(255,255,255,.1), 0 0 30px rgba(255,255,255,.4);
 }
 
-
+.navbar .nav > li > a {
+  text-shadow: none;
+  color: #fff;
+}
+.navbar .nav > li > a:hover {
+  color: #D6E03D;
+}
+.navbar .nav > .active > a, .navbar .nav > .active > a:hover, .navbar .nav > .active > a:focus {
+  color: #D6E03D;
+  background-color: transparent;
+  box-shadow: none;
+}
 /* Sections
 -------------------------------------------------- */
 
