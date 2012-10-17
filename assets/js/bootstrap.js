@@ -1,5 +1,5 @@
 /* ===================================================
- * bootstrap-transition.js v2.1.1
+ * bootstrap-transition.js v2.1.2
  * http://twitter.github.com/bootstrap/javascript.html#transitions
  * ===================================================
  * Copyright 2012 Twitter, Inc.
@@ -20,13 +20,13 @@
 
 !function ($) {
 
+  "use strict"; // jshint ;_;
+
+
+  /* CSS TRANSITION SUPPORT (http://www.modernizr.com/)
+   * ======================================================= */
+
   $(function () {
-
-    "use strict"; // jshint ;_;
-
-
-    /* CSS TRANSITION SUPPORT (http://www.modernizr.com/)
-     * ======================================================= */
 
     $.support.transition = (function () {
 
@@ -58,7 +58,7 @@
   })
 
 }(window.jQuery);/* ==========================================================
- * bootstrap-alert.js v2.1.1
+ * bootstrap-alert.js v2.1.2
  * http://twitter.github.com/bootstrap/javascript.html#alerts
  * ==========================================================
  * Copyright 2012 Twitter, Inc.
@@ -147,7 +147,7 @@
   })
 
 }(window.jQuery);/* ============================================================
- * bootstrap-button.js v2.1.1
+ * bootstrap-button.js v2.1.2
  * http://twitter.github.com/bootstrap/javascript.html#buttons
  * ============================================================
  * Copyright 2012 Twitter, Inc.
@@ -242,7 +242,7 @@
   })
 
 }(window.jQuery);/* ==========================================================
- * bootstrap-carousel.js v2.1.1
+ * bootstrap-carousel.js v2.0.2
  * http://twitter.github.com/bootstrap/javascript.html#carousel
  * ==========================================================
  * Copyright 2012 Twitter, Inc.
@@ -261,35 +261,55 @@
  * ========================================================== */
 
 
-!function ($) {
+!function( $ ){
 
-  "use strict"; // jshint ;_;
-
+  "use strict";
 
  /* CAROUSEL CLASS DEFINITION
   * ========================= */
 
   var Carousel = function (element, options) {
     this.$element = $(element)
+    //this.options = $.extend({}, $.fn.carousel.defaults, options)
     this.options = options
     this.options.slide && this.slide(this.options.slide)
     this.options.pause == 'hover' && this.$element
       .on('mouseenter', $.proxy(this.pause, this))
       .on('mouseleave', $.proxy(this.cycle, this))
+
+    this.touch = {
+       supported: "ontouchend" in document
+    ,  startedAt: 0
+    ,  endedAt: 0
+    ,  startX: 0
+    ,  endX: 0
+    ,  startY: 0
+    ,  endY: 0
+    ,  isScroll: false
+    }
+
+    if (this.options.touch && this.touch.supported === true) {
+      this.$element
+        .on('touchstart', $.proxy(this.touchstart, this))
+        .on('touchmove', $.proxy(this.touchmove, this))
+        .on('touchend', $.proxy(this.touchend, this))
+
+      this.options.touchHideControls && this.$element
+        .children('.carousel-control').fadeOut('slow')
+    }
   }
 
   Carousel.prototype = {
 
-    cycle: function (e) {
-      if (!e) this.paused = false
+    cycle: function () {
+      //this.interval = setInterval($.proxy(this.next, this), this.options.interval)
       this.options.interval
-        && !this.paused
         && (this.interval = setInterval($.proxy(this.next, this), this.options.interval))
       return this
     }
 
   , to: function (pos) {
-      var $active = this.$element.find('.item.active')
+      var $active = this.$element.find('.active')
         , children = $active.parent().children()
         , activePos = children.index($active)
         , that = this
@@ -309,12 +329,7 @@
       return this.slide(pos > activePos ? 'next' : 'prev', $(children[pos]))
     }
 
-  , pause: function (e) {
-      if (!e) this.paused = true
-      if (this.$element.find('.next, .prev').length && $.support.transition.end) {
-        this.$element.trigger($.support.transition.end)
-        this.cycle()
-      }
+  , pause: function () {
       clearInterval(this.interval)
       this.interval = null
       return this
@@ -331,15 +346,12 @@
     }
 
   , slide: function (type, next) {
-      var $active = this.$element.find('.item.active')
+      var $active = this.$element.find('.active')
         , $next = next || $active[type]()
         , isCycling = this.interval
         , direction = type == 'next' ? 'left' : 'right'
         , fallback  = type == 'next' ? 'first' : 'last'
         , that = this
-        , e = $.Event('slide', {
-            relatedTarget: $next[0]
-          })
 
       this.sliding = true
 
@@ -349,26 +361,24 @@
 
       if ($next.hasClass('active')) return
 
-      if ($.support.transition && this.$element.hasClass('slide')) {
-        this.$element.trigger(e)
-        if (e.isDefaultPrevented()) return
+      if (!$.support.transition && this.$element.hasClass('slide')) {
+        this.$element.trigger('slide')
+        $active.removeClass('active')
+        $next.addClass('active')
+        this.sliding = false
+        this.$element.trigger('slid')
+      } else {
         $next.addClass(type)
         $next[0].offsetWidth // force reflow
         $active.addClass(direction)
         $next.addClass(direction)
+        this.$element.trigger('slide')
         this.$element.one($.support.transition.end, function () {
           $next.removeClass([type, direction].join(' ')).addClass('active')
           $active.removeClass(['active', direction].join(' '))
           that.sliding = false
           setTimeout(function () { that.$element.trigger('slid') }, 0)
         })
-      } else {
-        this.$element.trigger(e)
-        if (e.isDefaultPrevented()) return
-        $active.removeClass('active')
-        $next.addClass('active')
-        this.sliding = false
-        this.$element.trigger('slid')
       }
 
       isCycling && this.cycle()
@@ -376,21 +386,59 @@
       return this
     }
 
+  , touchstart: function(e) {
+      this.touch.startedAt = e.timeStamp
+      this.touch.startX = e.originalEvent.touches ? e.originalEvent.touches[0].pageX : e.pageX
+      this.touch.startY = e.originalEvent.touches ? e.originalEvent.touches[0].pageY : e.pageY
+    }
+
+  , touchmove: function(e) {
+      this.touch.endX = e.originalEvent.touches ? e.originalEvent.touches[0].pageX : e.pageX
+      this.touch.endY = e.originalEvent.touches ? e.originalEvent.touches[0].pageY : e.pageY
+
+      this.touch.isScroll = Boolean(Math.abs(this.touch.endX - this.touch.startX) < Math.abs(this.touch.endY - this.touch.startY));
+
+      !this.touch.isScroll && e.preventDefault();
+    }
+
+  , touchend: function(e) {
+      this.touch.endedAt = e.timeStamp
+      var distance = (this.touch.startX === 0) ? 0 : Math.abs(this.touch.endX - this.touch.startX)
+
+      if (!this.touch.isScroll && this.touch.startedAt !== 0) {
+        if ((this.touch.endedAt - this.touch.startedAt) < this.options.touchMaxTime && distance > this.options.touchMaxDistance) {
+          if (this.touch.endX < this.touch.startX) {
+            this.next().pause();
+          } else if (this.touch.endX > this.touch.startX) {
+            this.prev().pause();
+          }
+        }
+      }
+
+      this.touch.startedAt = 0
+      this.touch.endedAt = 0
+      this.touch.startX = 0
+      this.touch.endX = 0
+      this.touch.startY = 0
+      this.touch.endY = 0
+      this.touch.isScroll = false
+    }
   }
 
 
  /* CAROUSEL PLUGIN DEFINITION
   * ========================== */
 
-  $.fn.carousel = function (option) {
+  $.fn.carousel = function ( option ) {
     return this.each(function () {
       var $this = $(this)
         , data = $this.data('carousel')
+        //, options = typeof option == 'object' && option
         , options = $.extend({}, $.fn.carousel.defaults, typeof option == 'object' && option)
-        , action = typeof option == 'string' ? option : options.slide
       if (!data) $this.data('carousel', (data = new Carousel(this, options)))
       if (typeof option == 'number') data.to(option)
-      else if (action) data[action]()
+      else if (typeof option == 'string' || (option = options.slide)) data[option]()
+      //else data.cycle()
       else if (options.interval) data.cycle()
     })
   }
@@ -398,6 +446,10 @@
   $.fn.carousel.defaults = {
     interval: 5000
   , pause: 'hover'
+  , touch: true
+  , touchMaxTime: 1000
+  , touchMaxDistance: 50
+  , touchHideControls: true
   }
 
   $.fn.carousel.Constructor = Carousel
@@ -416,8 +468,9 @@
     })
   })
 
-}(window.jQuery);/* =============================================================
- * bootstrap-collapse.js v2.1.1
+}( window.jQuery );
+/* =============================================================
+ * bootstrap-collapse.js v2.1.2
  * http://twitter.github.com/bootstrap/javascript.html#collapse
  * =============================================================
  * Copyright 2012 Twitter, Inc.
@@ -574,7 +627,7 @@
   })
 
 }(window.jQuery);/* ============================================================
- * bootstrap-dropdown.js v2.1.1
+ * bootstrap-dropdown.js v2.1.2
  * http://twitter.github.com/bootstrap/javascript.html#dropdowns
  * ============================================================
  * Copyright 2012 Twitter, Inc.
@@ -723,7 +776,7 @@
   })
 
 }(window.jQuery);/* =========================================================
- * bootstrap-modal.js v2.1.1
+ * bootstrap-modal.js v2.1.2
  * http://twitter.github.com/bootstrap/javascript.html#modals
  * =========================================================
  * Copyright 2012 Twitter, Inc.
@@ -773,8 +826,6 @@
 
         if (this.isShown || e.isDefaultPrevented()) return
 
-        $('body').addClass('modal-open')
-
         this.isShown = true
 
         this.escape()
@@ -819,8 +870,6 @@
         if (!this.isShown || e.isDefaultPrevented()) return
 
         this.isShown = false
-
-        $('body').removeClass('modal-open')
 
         this.escape()
 
@@ -961,7 +1010,7 @@
   })
 
 }(window.jQuery);/* ===========================================================
- * bootstrap-tooltip.js v2.1.1
+ * bootstrap-tooltip.js v2.1.2
  * http://twitter.github.com/bootstrap/javascript.html#tooltips
  * Inspired by the original jQuery.tipsy by Jason Frame
  * ===========================================================
@@ -1083,7 +1132,7 @@
         $tip
           .remove()
           .css({ top: 0, left: 0, display: 'block' })
-          .appendTo(inside ? this.$element : document.body)
+          .insertAfter(this.$element)
 
         pos = this.getPosition(inside)
 
@@ -1106,7 +1155,7 @@
         }
 
         $tip
-          .css(tp)
+          .offset(tp)
           .addClass(placement)
           .addClass('in')
       }
@@ -1231,12 +1280,11 @@
   , trigger: 'hover'
   , title: ''
   , delay: 0
-  , html: true
+  , html: false
   }
 
-}(window.jQuery);
-/* ===========================================================
- * bootstrap-popover.js v2.1.1
+}(window.jQuery);/* ===========================================================
+ * bootstrap-popover.js v2.1.2
  * http://twitter.github.com/bootstrap/javascript.html#popovers
  * ===========================================================
  * Copyright 2012 Twitter, Inc.
@@ -1338,7 +1386,7 @@
   })
 
 }(window.jQuery);/* =============================================================
- * bootstrap-scrollspy.js v2.1.1
+ * bootstrap-scrollspy.js v2.1.2
  * http://twitter.github.com/bootstrap/javascript.html#scrollspy
  * =============================================================
  * Copyright 2012 Twitter, Inc.
@@ -1488,7 +1536,7 @@
   })
 
 }(window.jQuery);/* ========================================================
- * bootstrap-tab.js v2.1.1
+ * bootstrap-tab.js v2.1.2
  * http://twitter.github.com/bootstrap/javascript.html#tabs
  * ========================================================
  * Copyright 2012 Twitter, Inc.
@@ -1622,7 +1670,7 @@
   })
 
 }(window.jQuery);/* =============================================================
- * bootstrap-typeahead.js v2.1.1
+ * bootstrap-typeahead.js v2.1.2
  * http://twitter.github.com/bootstrap/javascript.html#typeahead
  * =============================================================
  * Copyright 2012 Twitter, Inc.
@@ -1797,13 +1845,22 @@
         .on('keypress', $.proxy(this.keypress, this))
         .on('keyup',    $.proxy(this.keyup, this))
 
-      if ($.browser.chrome || $.browser.webkit || $.browser.msie) {
+      if (this.eventSupported('keydown')) {
         this.$element.on('keydown', $.proxy(this.keydown, this))
       }
 
       this.$menu
         .on('click', $.proxy(this.click, this))
         .on('mouseenter', 'li', $.proxy(this.mouseenter, this))
+    }
+
+  , eventSupported: function(eventName) {
+      var isSupported = eventName in this.$element
+      if (!isSupported) {
+        this.$element.setAttribute(eventName, 'return;')
+        isSupported = typeof this.$element[eventName] === 'function'
+      }
+      return isSupported
     }
 
   , move: function (e) {
@@ -1922,7 +1979,7 @@
 
 }(window.jQuery);
 /* ==========================================================
- * bootstrap-affix.js v2.1.1
+ * bootstrap-affix.js v2.1.2
  * http://twitter.github.com/bootstrap/javascript.html#affix
  * ==========================================================
  * Copyright 2012 Twitter, Inc.
@@ -1951,7 +2008,9 @@
 
   var Affix = function (element, options) {
     this.options = $.extend({}, $.fn.affix.defaults, options)
-    this.$window = $(window).on('scroll.affix.data-api', $.proxy(this.checkPosition, this))
+    this.$window = $(window)
+      .on('scroll.affix.data-api', $.proxy(this.checkPosition, this))
+      .on('click.affix.data-api',  $.proxy(function () { setTimeout($.proxy(this.checkPosition, this), 1) }, this))
     this.$element = $(element)
     this.checkPosition()
   }
