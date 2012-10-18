@@ -37,6 +37,7 @@ body > .navbar .navbar-inner {
   background-repeat: no-repeat;
   background-color: #000;
   border: 0;
+  overflow: visible
 }
 
 /* Change the docs' brand */
@@ -56,24 +57,13 @@ body > .navbar .brand {
   -webkit-transition: all .2s linear;
      -moz-transition: all .2s linear;
           transition: all .2s linear;
+  z-index: 99;
+  position: relative;
 
 }
 body > .navbar .brand:hover {
   text-decoration: none;
   text-shadow: 0 1px 0 rgba(255,255,255,.1), 0 0 30px rgba(255,255,255,.4);
-}
-
-.navbar .nav > li > a {
-  text-shadow: none;
-  color: #fff;
-}
-.navbar .nav > li > a:hover {
-  color: #D6E03D;
-}
-.navbar .nav > .active > a, .navbar .nav > .active > a:hover, .navbar .nav > .active > a:focus {
-  color: #D6E03D;
-  background-color: transparent;
-  box-shadow: none;
 }
 
 
@@ -866,10 +856,20 @@ form.bs-docs-example {
   body > .navbar-fixed-top .brand {
     float: left;
     margin-left: 0;
-    padding-left: 10px;
+    padding-left: 85px;
     padding-right: 10px;
+    background-position-x: left;
+    position: absolute;
+    z-index: 101;
   }
-
+  body > .navbar .navbar-inner .nav-collapse.in.collapse {
+    z-index: 100;
+    background-color: #000;
+    padding-left: 70px;
+    margin-top: 45px;
+    margin-left: -5px;
+    margin-right: -5px;
+  }
   /* Inline-block quick links for more spacing */
   .quick-links li {
     display: inline-block;
