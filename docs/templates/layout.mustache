@@ -20,23 +20,11 @@
 
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="assets/ico/favicon.ico">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="assets/ico/pac12-touch-icon-144.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="assets/ico/pac12-touch-icon-114.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="assets/ico/pac12-touch-icon-72.png">
+    <link rel="apple-touch-icon" href="assets/ico/pac12-touch-icon-57.png">
 
-    {{#production}}
-    <script type="text/javascript">
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-146052-10']);
-      _gaq.push(['_trackPageview']);
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-    </script>
-    {{/production}}
   </head>
 
   <body data-spy="scroll" data-target=".bs-docs-sidebar">
@@ -91,11 +79,11 @@
         <p>{{_i}}Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.{{/i}}</p>
         <p>{{_i}}<a href="http://glyphicons.com">Glyphicons Free</a> licensed under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.{{/i}}</p>
         <ul class="footer-links">
-          <li><a href="http://blog.getbootstrap.com">{{_i}}Blog{{/i}}</a></li>
+          <li><a href="http://blog.pac12.com">{{_i}}Pac-12 Blog{{/i}}</a></li>
           <li class="muted">&middot;</li>
-          <li><a href="https://github.com/twitter/bootstrap/issues?state=open">{{_i}}Issues{{/i}}</a></li>
+          <li><a href="https://github.com/twitter/bootstrap/issues?state=open">{{_i}}Bootstrap Issues{{/i}}</a></li>
           <li class="muted">&middot;</li>
-          <li><a href="https://github.com/twitter/bootstrap/wiki">{{_i}}Roadmap and changelog{{/i}}</a></li>
+          <li><a href="https://github.com/twitter/bootstrap/wiki">{{_i}}Bootstrap Roadmap and changelog{{/i}}</a></li>
         </ul>
       </div>
     </footer>
@@ -123,24 +111,6 @@
     <script src="assets/js/bootstrap-affix.js"></script>
     <script src="assets/js/application.js"></script>
 
-
-    {{#production}}
-    <!-- Analytics
-    ================================================== -->
-    <script>
-      var _gauges = _gauges || [];
-      (function() {
-        var t   = document.createElement('script');
-        t.type  = 'text/javascript';
-        t.async = true;
-        t.id    = 'gauges-tracker';
-        t.setAttribute('data-site-id', '4f0dc9fef5a1f55508000013');
-        t.src = '//secure.gaug.es/track.js';
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(t, s);
-      })();
-    </script>
-    {{/production}}
 
   </body>
 </html>
